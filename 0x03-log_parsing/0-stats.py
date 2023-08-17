@@ -1,29 +1,45 @@
 #!/usr/bin/python3
-"""Log parsing reads a stdin line by line and computes metrics"""
 
-import fileinput
-from typing import List
+""" log parse """
+
+import sys
 
 
-line_count = 0
-total_size = 0
-status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
+def print_stat(key, size):
+    """ Prints stats info """
+    print("File size: {:d}".format(size))
+    for i in sorted(key.keys()):
+        if key[i] != 0:
+            print("{}: {:d}".format(i, key[i]))
 
-for line in fileinput.input():
-    ln = line.split()
 
-    if len(ln) != 9:
-        continue
+stat_codes = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
+               "404": 0, "405": 0, "500": 0}
 
-    line_count += 1
-    total_size += int(ln[8])
+stat_count = 0
+size = 0
 
-    if int(ln[7]) in status_codes.keys():
-        status_codes[int(ln[7])] += 1
-    if line_count == 10:
-        print("File size: {}".format(total_size))
-        for key in sorted(status_codes.keys()):
-            print("{}: {}".format(key, status_codes[key]))
+try:
+    for line in sys.stdin:
+        if stat_count != 0 and stat_count % 10 == 0:
+            print_stat(stat_codes, size)
 
-        line_count = 0
-        total_size = 0
+        stlist = line.split()
+        stat_count += 1
+
+        try:
+            size += int(stlist[-1])
+        except Exception:
+            pass
+
+        try:
+            if stlist[-2] in stat_codes:
+                stat_codes[stlist[-2]] += 1
+        except Exception:
+            pass
+    print_stat(stat_codes, size)
+
+
+except KeyboardInterrupt:
+    print_stat(stat_codes, size)
+    raise
