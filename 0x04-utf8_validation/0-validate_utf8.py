@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+""" utf8-validation """
+
 
 def validUTF8(data):
     """ This method determines if a given data set
@@ -20,7 +22,7 @@ def validUTF8(data):
         # If no continuation bytes is expected
         if continuation_bytes == 0:
             # continuation bytes determined by the
-            # number of leading 1's in current byte
+            # number of leading 1's in current byte 
             while leading_ones & byte:
                 continuation_bytes += 1
                 leading_ones = leading_ones >> 1
@@ -50,3 +52,4 @@ def validUTF8(data):
         return True
     else:
         return False
+    
